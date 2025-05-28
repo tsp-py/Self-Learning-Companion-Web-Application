@@ -39,27 +39,25 @@ A single-user learning management system to upload files, track study time, and 
 ### Setup Instructions
 
 1. Clone the repo:
-   ```bash
+   ```
    git clone https://github.com/tsp-py/self-learning-companion-Web-Application.git
    cd self-learning-companion-Web-Application
 2. Create and activate a Python virtual environment:
+   ```
    python -m venv venv
    source venv/bin/activate   # Windows: venv\Scripts\activate
 3. Install dependencies:
+   ```
    pip install -r requirements.txt
 4. Initialize the database:
+   ```
    flask db init
    flask db migrate
    flask db upgrade
 5. Run the Flask development server:
+   ```
    python app.py
 6. Open your browser at http://localhost:5000
-
-Default Credentials
-  Email	                    Password
-  admin@sololearn.com	      securepassword123
-
-Important: Change the default password after your first login!
 
 ## 📡 API Endpoints
 
