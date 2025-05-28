@@ -119,7 +119,7 @@ External Resources(Searches)
 ## 🛠️ Getting Started
 
 ```bash
-git clone https://github.com/tsp-py/self-learning-companion-Web-Application.git
+git clone https://github.com/tsp-py/Self-Learning-Companion-Web-Application.git
 cd self-learning-companion-Web-Applicationb
 pip install -r requirements.txt
 python app.py
