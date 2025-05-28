@@ -1,119 +1,90 @@
+# SoloLearn – Personal Learning Management System
 
-# SoloLearn - Personal Learning Management System
+A single-user learning management system to upload files, track study time, and visualize learning progress with real-time analytics.
 
-A single-user learning management system with time tracking and analytics capabilities.
+---
 
 ## Features
 
-- Secure authentication (single user)
-- Multi-format file ingestion (PDFs, Docs, Videos)
-- Time tracking and analytics
-- Custom learning paths
-- Real-time visual analytics
-
-## Prerequisites
-
-- Python 3.8+
-- Node.js 16+
-- SQLite3
-
-## Backend Setup
-
-1. Create a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-3. Initialize the database:
-```bash
-flask db init
-flask db migrate
-flask db upgrade
-```
-
-4. Run the development server:
-```bash
-python app.py
-```
-
-The server will start at http://localhost:5000
-
-## Default Credentials
-
-- Email: admin@sololearn.com
-- Password: securepassword123
-
-## API Endpoints
-
-### Authentication
-- POST /api/auth/login - Login with email/password
-- POST /api/auth/logout - End session
-- GET /api/auth/me - Get current user
-
-### Files
-- POST /api/files/upload - Upload new file
-- GET /api/files - List all files
-- GET /api/files/:id - Get file details
-
-### Learning Paths
-- POST /api/paths - Create new path
-- GET /api/paths - List all paths
-- GET /api/paths/:id - Get path details
-- POST /api/paths/:id/resources/:rid/complete - Mark resource as complete
-
-### Time Tracking
-- POST /api/tracking/start - Start reading session
-- POST /api/tracking/end - End reading session
-- GET /api/tracking/stats - Get usage statistics
-
-## Security Notes
-
-- Change the default password after first login
-- Set a secure SECRET_KEY in production
-- Enable HTTPS in production
-- Configure proper CORS settings for production
-
-## License
-
-MIT License 
-
-# Self-Learning-Companion-Web-Application
-Built a Flask-based platform for solo learners to upload files, track study time, and visualize learning via graphs. Added a smart search tool to fetch external study materials (PDF, DOCX, etc.) directly within the app, making self-study more organized and efficient.
-
-**A smart digital workspace for solo learners**  
-Track what you read, how long you read, and explore new content — all from one powerful dashboard.
+- Secure single-user authentication  
+- Upload and manage PDFs, DOCX, Videos  
+- Track time spent on each learning resource  
+- Create and follow custom learning paths  
+- Real-time interactive progress graphs  
+- Built-in web scraper to fetch external study materials  
 
 ---
 
-## 🚀 Features
+## Tech Stack
 
-✅ **Personal File Uploads** – Upload and manage your own learning materials.  
-⏱️ **Time Tracking** – Know exactly how much time you spend on each file.  
-📊 **Visual Learning Reports** – Interactive graphs to monitor your progress.  
-🌐 **Built-in Content Scraper** – Search and fetch PDFs/DOCX from the web without leaving the platform.  
-📁 **No Instructor Needed** – Designed for full autonomy and simplicity.
-
----
-
-## 🧰 Tech Stack
-
-| Layer        | Tech Used                      |
-|--------------|--------------------------------|
-| Backend      | Python, Flask                  |
-| Frontend     | HTML, CSS, JavaScript          |
-| Data Viz     | Chart.js                       |
-| Scraping     | BeautifulSoup, Requests        |
-| Auth & Logic | Flask Sessions, SQL/CSV/JSON   |
+| Layer        | Technology                  |
+|--------------|-----------------------------|
+| Backend      | Python, Flask               |
+| Frontend     | HTML, CSS, JavaScript       |
+| Database     | SQLite3                    |
+| Data Visualization | Chart.js              |
+| Web Scraping | BeautifulSoup, Requests     |
+| Auth & Logic | Flask Sessions, SQL/CSV/JSON|
 
 ---
 
-## 📸 Sneak Peek
+## Getting Started
+
+### Prerequisites
+
+- Python 3.8+  
+- Node.js 16+  
+- SQLite3  
+
+### Setup Instructions
+
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/tsp-py/self-learning-companion-Web-Application.git
+   cd self-learning-companion-Web-Application
+2. Create and activate a Python virtual environment:
+   python -m venv venv
+   source venv/bin/activate   # Windows: venv\Scripts\activate
+3. Install dependencies:
+   pip install -r requirements.txt
+4. Initialize the database:
+   flask db init
+   flask db migrate
+   flask db upgrade
+5. Run the Flask development server:
+   python app.py
+6. Open your browser at http://localhost:5000
+
+Default Credentials
+  Email	                    Password
+  admin@sololearn.com	      securepassword123
+
+Important: Change the default password after your first login!
+
+## 📡 API Endpoints
+
+### 🔐 Authentication
+- `POST /api/auth/login` – User login  
+- `POST /api/auth/logout` – Logout  
+- `GET /api/auth/me` – Get current user info  
+
+### 📁 File Management
+- `POST /api/files/upload` – Upload a file  
+- `GET /api/files` – List all files  
+- `GET /api/files/:id` – File details  
+
+### 🧭 Learning Paths
+- `POST /api/paths` – Create a learning path  
+- `GET /api/paths` – List all paths  
+- `GET /api/paths/:id` – Path details  
+- `POST /api/paths/:id/resources/:rid/complete` – Mark resource as complete  
+
+### ⏱️ Time Tracking
+- `POST /api/tracking/start` – Start session  
+- `POST /api/tracking/end` – End session  
+- `GET /api/tracking/stats` – Get usage stats  
+
+## 📸 Screenshots
 
 🖼️Screenshots of file manager, usage graphs, and smart search.
 
