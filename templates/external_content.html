@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>External Content - SoloLearn</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <link href="/static/css/styles.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0d6efd;
+            --gradient-start: #0d6efd;
+            --gradient-end: #28a745;
+        }
+        
+        body { 
+            padding-top: 5rem;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* Fix navigation link styles */
+        .nav-tabs {
+            border-bottom: 2px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        .nav-tabs .nav-link {
+            color: #495057;
+            background-color: #f8f9fa;
+            border: 2px solid transparent;
+            border-radius: 5px 5px 0 0;
+            margin-right: 4px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: var(--primary-blue);
+            border-color: #e9ecef #e9ecef #dee2e6;
+            background-color: #fff;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--primary-blue);
+            background-color: #fff;
+            border-color: #dee2e6 #dee2e6 #fff;
+            border-bottom: 2px solid var(--primary-blue);
+        }
+
+        /* Add shadow effect on hover */
+        .nav-tabs .nav-link:hover {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-logout {
+            background: white;
+            color: var(--primary-blue);
+            border-radius: 25px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+        }
+
+        .category-nav {
+            display: flex;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+            padding: 0.5rem;
+            gap: 0.5rem;
+            background: white;
+            border-radius: var(--border-radius-pill);
+            box-shadow: var(--shadow-sm);
+        }
+        .category-nav::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        .category-btn {
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: var(--border-radius-pill);
+            padding: 0.5rem 1.25rem;
+            transition: all 0.3s;
+            background: white;
+            border: 2px solid #e0e7ff;
+            color: var(--primary-blue);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+        .category-btn.active {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            border: none;
+        }
+        .option-btn {
+            border-radius: var(--border-radius-pill);
+            padding: 0.75rem 1rem;
+            transition: all 0.3s;
+            background: white;
+            border: 2px solid #e0e7ff;
+            color: var(--primary-blue);
+            width: 100%;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 3.5rem;
+        }
+        .option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+            border-color: var(--primary-blue);
+        }
+        .option-btn.active {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            border: none;
+            box-shadow: var(--shadow-md);
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        @media (max-width: 768px) {
+            .options-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .search-card {
+            border: 1px solid rgba(67, 97, 238, 0.1);
+            border-radius: var(--border-radius);
+            transition: all 0.3s;
+        }
+        .search-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+        .search-card .card-header {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+        .search-input {
+            border-radius: var(--border-radius-pill);
+            padding: 0.75rem 1.25rem;
+            border: 2px solid #e0e7ff;
+            transition: all 0.3s;
+        }
+        .search-input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+        }
+        .search-btn {
+            border-radius: var(--border-radius-pill);
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .result-card {
+            border: 1px solid rgba(67, 97, 238, 0.1);
+            border-radius: var(--border-radius);
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+        .result-card .card-header {
+            background: #f8faff;
+            border-bottom: 1px solid rgba(67, 97, 238, 0.1);
+        }
+        .result-card .card-footer {
+            background: #f8faff;
+            border-top: 1px solid rgba(67, 97, 238, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/dashboard">SoloLearn</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/files">Files</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/stats">Statistics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/external-content">External Content</a>
+                    </li>
+                </ul>
+                <button id="logoutButton" class="btn btn-logout" type="button">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="gradient-banner">
+            <h1>Search External Content</h1>
+            <p class="lead mb-0">Discover and explore learning resources from across the web.</p>
+        </div>
+        
+        <div class="card-section">
+            <div class="container mt-4">
+            <div class="mb-4">
+                <div class="category-nav">
+                    <button class="category-btn active" data-engine-id="16515fddb6b0e4c25">All</button>
+                    <button class="category-btn" data-engine-id="resources">Resources</button>
+                    <button class="category-btn" data-engine-id="d048e348fed8e4cc1">Videos</button>
+                    <button class="category-btn" data-engine-id="4185cbb8ac4644600">Courses</button>
+                    <button class="category-btn" data-engine-id="7216dca65f99149b6">Practice</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- All Search simple UI - shown by default -->
+            <div id="allSearchSection" class="row mb-4">
+                <div class="col-12">
+                    <div class="card search-card">
+                        <div class="card-header">
+                            All Search
+                        </div>
+                        <div class="card-body">
+                            <div class="input-group">
+                                <input type="text" id="allSearchInput" class="form-control search-input" placeholder="Search for anything...">
+                                <button class="btn btn-primary search-btn" type="button" id="allSearchBtn">
+                                    <i class="bi bi-search"></i> Search
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category-specific search sections -->
+            <div id="categorySearchSections" class="row mb-4" style="display: none;">
+                <div class="col-12">
+                    <div class="card search-card">
+                        <div class="card-header">
+                            <span id="categoryTitle">Category Search</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <div class="options-grid" id="categoryOptions">
+                                    <!-- Options will be populated here -->
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <input type="text" id="categorySearchInput" class="form-control search-input" placeholder="Search within category...">
+                                <button class="btn btn-primary search-btn" type="button" id="categorySearchBtn">
+                                    <i class="bi bi-search"></i> Search
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Results -->
+            <div id="searchResults" class="row">
+                <!-- Results will be populated here -->
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/utils.js"></script>
+    <script>
+        document.getElementById('logoutButton').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/auth/logout', { method: 'POST' });
+                if (response.ok) {
+                    window.location.href = '/login';
+                } else {
+                    alert('Logout failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('An error occurred during logout.');
+            }
+        });
+        
+        // Category options for each category
+        const categoryOptions = {
+            '16515fddb6b0e4c25': [], // No filters for All search
+            'resources': [ // Resource filters
+                { name: 'All Sources', value: 'all' },
+                { name: 'Educational', value: 'educational' },
+                { name: 'Academic', value: 'academic' },
+                { name: 'Learning', value: 'learning' },
+                { name: 'PDF Documents', value: 'pdf' },
+                { name: 'E-Books', value: 'ebook' },
+                { name: 'Articles', value: 'article' },
+                { name: 'Documentation', value: 'docs' }
+            ],
+            'd048e348fed8e4cc1': [
+                { name: 'Tutorials', value: 'tutorial' },
+                { name: 'Lectures', value: 'lecture' },
+                { name: 'Webinars', value: 'webinar' },
+                { name: 'Demos', value: 'demo' }
+            ],
+            '4185cbb8ac4644600': [
+                { name: 'Free Courses', value: 'free' },
+                { name: 'Paid Courses', value: 'paid' },
+                { name: 'Certification', value: 'certification' },
+                { name: 'Beginner', value: 'beginner' },
+                { name: 'Advanced', value: 'advanced' }
+            ],
+            '7216dca65f99149b6': [
+                { name: 'Exercises', value: 'exercises' },
+                { name: 'Projects', value: 'projects' },
+                { name: 'Challenges', value: 'challenges' },
+                { name: 'Examples', value: 'examples' }
+            ]
+        };
+        
+        // Current selected category - set to All by default
+        let currentEngineId = "16515fddb6b0e4c25";
+        
+        // External Search Category Navigation
+        document.querySelectorAll('.category-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Get engine ID and set it as current
+                currentEngineId = this.getAttribute('data-engine-id');
+                
+                // Get category name
+                const categoryName = this.textContent.trim();
+                
+                // If All category is selected
+                if (categoryName === 'All') {
+                    document.getElementById('allSearchSection').style.display = 'block';
+                    document.getElementById('categorySearchSections').style.display = 'none';
+                    document.getElementById('allSearchInput').focus();
+                } else {
+                    // For other categories
+                    document.getElementById('allSearchSection').style.display = 'none';
+                    document.getElementById('categorySearchSections').style.display = 'block';
+                    document.getElementById('categoryTitle').textContent = categoryName + ' Search';
+                    
+                    // Load options for this category
+                    loadCategoryOptions(currentEngineId);
+                    
+                    // Focus on search input
+                    document.getElementById('categorySearchInput').focus();
+                }
+                
+                // Clear any previous search results
+                document.getElementById('searchResults').innerHTML = '';
+            });
+        });
+        
+        // Load options for the selected category
+        function loadCategoryOptions(engineId) {
+            const optionsContainer = document.getElementById('categoryOptions');
+            optionsContainer.innerHTML = '';
+            
+            const optionsSection = document.querySelector('.mb-3');
+            
+            if (categoryOptions[engineId] && categoryOptions[engineId].length > 0) {
+                optionsSection.style.display = 'block';
+                
+                categoryOptions[engineId].forEach(option => {
+                    const button = document.createElement('button');
+                    button.className = 'option-btn';
+                    button.setAttribute('data-value', option.value);
+                    button.textContent = option.name;
+                    button.addEventListener('click', function() {
+                        this.classList.toggle('active');
+                    });
+                    
+                    optionsContainer.appendChild(button);
+                });
+            } else {
+                optionsSection.style.display = 'none';
+            }
+        }
+        
+        // Handle All Search button click
+        document.getElementById('allSearchBtn').addEventListener('click', performAllSearch);
+        
+        // Trigger All Search when Enter is pressed in the All search input
+        document.getElementById('allSearchInput').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                performAllSearch();
+            }
+        });
+        
+        // Perform All search
+        async function performAllSearch() {
+            const query = document.getElementById('allSearchInput').value.trim();
+            const resultsContainer = document.getElementById('searchResults');
+            
+            if (!query) {
+                alert('Please enter a search term.');
+                return;
+            }
+            
+            resultsContainer.innerHTML = '<div class="col-12 text-center my-5"><div class="spinner-border" role="status"><span class="visually-hidden">Searching...</span></div></div>';
+            
+            try {
+                const response = await fetch(`/api/external-search?q=${encodeURIComponent(query)}&cx=16515fddb6b0e4c25`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayExternalResults(data.items || []);
+                } else {
+                    console.error('External search error:', data);
+                    resultsContainer.innerHTML = `<div class="col-12 alert alert-danger">Error searching: ${data.error || 'Unknown error'}</div>`;
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                resultsContainer.innerHTML = '<div class="col-12 alert alert-danger">An error occurred while fetching search results.</div>';
+            }
+        }
+        
+        // Handle category search button click
+        document.getElementById('categorySearchBtn').addEventListener('click', performCategorySearch);
+        
+        // Also trigger search when Enter is pressed in the category search input
+        document.getElementById('categorySearchInput').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                performCategorySearch();
+            }
+        });
+
+        async function performCategorySearch() {
+            if (!currentEngineId) {
+                alert('Please select a category first.');
+                return;
+            }
+            
+            const query = document.getElementById('categorySearchInput').value.trim();
+            const resultsContainer = document.getElementById('searchResults');
+            
+            // Only get selected options if options are available for this category
+            let searchQuery = query;
+            if (categoryOptions[currentEngineId] && categoryOptions[currentEngineId].length > 0) {
+                const selectedOptions = [];
+                document.querySelectorAll('.option-btn.active').forEach(btn => {
+                    selectedOptions.push(btn.getAttribute('data-value'));
+                });
+                
+                // Combine options with the search query
+                if (selectedOptions.length > 0) {
+                    searchQuery += ' ' + selectedOptions.join(' ');
+                }
+            }
+
+            if (!searchQuery) {
+                alert('Please enter a search term.');
+                return;
+            }
+
+            resultsContainer.innerHTML = '<div class="col-12 text-center my-5"><div class="spinner-border" role="status"><span class="visually-hidden">Searching...</span></div></div>';
+
+            try {
+                // Handle Resources category specially
+                let searchEngineId = currentEngineId;
+                if (currentEngineId === 'resources') {
+                    searchEngineId = '16515fddb6b0e4c25';
+                }
+                
+                const response = await fetch(`/api/external-search?q=${encodeURIComponent(searchQuery)}&cx=${searchEngineId}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayExternalResults(data.items || []);
+                } else {
+                    console.error('External search error:', data);
+                    resultsContainer.innerHTML = `<div class="col-12 alert alert-danger">Error searching: ${data.error || 'Unknown error'}</div>`;
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                resultsContainer.innerHTML = '<div class="col-12 alert alert-danger">An error occurred while fetching search results.</div>';
+            }
+        }
+
+        function displayExternalResults(items) {
+            const resultsContainer = document.getElementById('searchResults');
+            resultsContainer.innerHTML = ''; // Clear previous results or spinner
+
+            if (!items || items.length === 0) {
+                resultsContainer.innerHTML = '<div class="col-12"><p class="text-muted">No results found.</p></div>';
+                return;
+            }
+
+            items.forEach(item => {
+                const col = document.createElement('div');
+                col.className = 'col-md-6 col-lg-4'; // Adjust grid as needed
+
+                const card = document.createElement('div');
+                card.className = 'card h-100 shadow-sm';
+
+                // Optional: Add thumbnail if available
+                let imageHtml = '';
+                if (item.pagemap && item.pagemap.cse_thumbnail && item.pagemap.cse_thumbnail.length > 0) {
+                    imageHtml = `<img src="${item.pagemap.cse_thumbnail[0].src}" class="card-img-top" alt="${item.title}" style="max-height: 150px; object-fit: cover;">`;
+                }
+
+                card.innerHTML = `
+                    ${imageHtml}
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title"><a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.htmlTitle || item.title}</a></h5>
+                        <p class="card-text flex-grow-1">${item.htmlSnippet || item.snippet}</p>
+                        <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary mt-auto align-self-start">View Source</a>
+                    </div>
+                `;
+                col.appendChild(card);
+                resultsContainer.appendChild(col);
+            });
+        }
+        
+        // Initialize page - set All search as active on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Focus on the All search input
+            document.getElementById('allSearchInput').focus();
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Use Jinja to insert the file name in the title -->
+    <title>{{ file.name }} - SoloLearn</title> 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0d6efd;
+            --gradient-start: #0d6efd;
+            --gradient-end: #28a745;
+        }
+        
+        body { 
+            padding-top: 5rem;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) !important;
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .btn-logout {
+            background: white;
+            color: var(--primary-blue);
+            border-radius: 25px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <!-- Updated navbar with gradient background -->
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/dashboard">SoloLearn</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/files">Files</a> 
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/stats">Statistics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/external-content">External Content</a>
+                    </li>
+                </ul>
+                <button id="logoutButton" class="btn btn-logout" type="button">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="my-4 p-5 bg-light rounded">
+            <!-- Display file details using Jinja -->
+            <h1>{{ file.name }}</h1> 
+            <p class="text-muted">Type: {{ file.filetype }} | Uploaded: {{ file.upload_date.strftime('%Y-%m-%d') }}</p>
+            {% if file.tags %}
+                <p>Tags: 
+                    {% for tag in file.tags %}
+                        <span class="badge bg-secondary me-1">{{ tag }}</span>
+                    {% endfor %}
+                </p>
+            {% endif %}
+            
+            <hr>
+
+            <!-- Time Tracking Section -->
+            <h2>Time Tracking</h2>
+            <div id="timeTrackingSection">
+                <p>Last time spent: <strong id="totalTime">{{ total_duration_seconds | format_duration }}</strong> | Total time spent: <strong id="totalTimeAll">{{ total_duration_seconds | format_duration }}</strong></p>
+                <p>Current session: <strong id="sessionTime">0s</strong></p> 
+                
+                <!-- Add Reset Button -->
+                <button id="resetTimeButton" class="btn btn-warning btn-sm mb-3">Reset Reading Time</button>
+                <button id="pauseResumeButton" class="btn btn-secondary btn-sm mb-3 ms-2">Pause</button>
+                <button id="bookmarkButton" class="btn btn-info btn-sm mb-3 ms-2">Bookmark</button>
+                
+                <!-- Progress Bar Section -->
+                <div class="progress-section mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span>Progress:</span>
+                        <span id="progressPercentage">0%</span>
+                    </div>
+                    <div class="progress" style="height: 20px;">
+                        <div id="progressBar" 
+                             class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" 
+                             style="width: 0%;" 
+                             aria-valuenow="0" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+                    <p class="text-muted mt-1">
+                        <small>Estimated time: <span id="estimatedTime">{{ file.estimated_duration | format_duration }}</span></small>
+                    </p>
+                </div>
+
+                <div id="trackingMessage" class="alert mt-3 d-none"></div>
+            </div>
+
+            <hr>
+
+            <!-- Placeholder for file content/viewer -->
+            <h2>File Content</h2>
+            {% if file.filetype == 'pdf' %}
+                <!-- Embed PDF using an iframe pointing to the serving route -->
+                <iframe src="{{ url_for('serve_file', file_id=file.id) }}" width="100%" height="600px" style="border: 1px solid #ccc;"></iframe>
+                <p><a href="{{ url_for('serve_file', file_id=file.id) }}" target="_blank">Open PDF in new tab</a></p>
+            {% elif file.filetype in ['docx', 'doc', 'pptx', 'ppt', 'xlsx', 'xls', 'txt'] and file.extracted_text %}
+                <!-- Display extracted text for document types -->
+                <p class="text-muted">Preview for this {{ file.filetype|upper }} file shows extracted text:</p>
+                <div id="extractedTextContainer" style="max-height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; background: #f8f9fa; white-space: pre-wrap; word-wrap: break-word;">
+                    {% for line in file.extracted_text.split('\n') %}
+                        <div class="extracted-line" id="line-{{ loop.index0 }}" style="position:relative; padding-left: 2em;">
+                            <button class="btn btn-sm btn-outline-info bookmark-line-btn" data-line="{{ loop.index0 }}" style="position:absolute; left:0; top:0;">🔖</button>
+                            <span>{{ line }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+                <p class="mt-2">
+                    <a href="{{ url_for('serve_file', file_id=file.id) }}" class="btn btn-primary" target="_blank">
+                        Download Original File
+                    </a>
+                </p>
+            {% else %}
+                <!-- Message if no preview is available -->
+                <p>No preview available for this file type.</p>
+                <p class="mt-2">
+                    <a href="{{ url_for('serve_file', file_id=file.id) }}" class="btn btn-primary" target="_blank">
+                        Download File
+                    </a>
+                </p>
+            {% endif %}
+
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const fileId = {{ file.id }}; // Get file ID from Jinja
+        const totalTimeDiv = document.getElementById('totalTime');
+        const totalTimeAllDiv = document.getElementById('totalTimeAll');
+        const sessionTimeDiv = document.getElementById('sessionTime');
+        const trackingMessageDiv = document.getElementById('trackingMessage');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercentage = document.getElementById('progressPercentage');
+        
+        // Tracking state variables
+        let isTracking = false;
+        let currentLogId = null;
+        let sessionDurationSeconds = 0;
+        let totalDurationSeconds = {{ total_duration_seconds|default(0) }};
+        let timerInterval = null;
+        let lastUpdateTime = Date.now();
+        let isPaused = false;
+
+        // Update progress bar function to take current total time as parameter
+        function updateProgress(currentTotalSeconds) {
+            const estimatedDuration = {{ file.estimated_duration|default(3600) }};
+            const progressPercent = Math.min((currentTotalSeconds / estimatedDuration) * 100, 100);
+            const roundedPercent = Math.round(progressPercent); // Round for display
+            
+            progressBar.style.width = `${progressPercent}%`;
+            progressBar.setAttribute('aria-valuenow', progressPercent);
+            progressPercentage.textContent = `${roundedPercent}%`; // Update percentage text
+            
+            // Update color based on progress (Reverting to blue/yellow/green)
+            if (progressPercent >= 100) {
+                progressBar.className = 'progress-bar bg-success';
+            } else if (progressPercent >= 75) {
+                progressBar.className = 'progress-bar bg-warning';
+            } else {
+                progressBar.className = 'progress-bar bg-info'; // Default to blue
+            }
+        }
+
+        // --- Logout Functionality ---
+        document.getElementById('logoutButton').addEventListener('click', async () => {
+            if (isTracking) {
+                // Try to send a final update before logging out
+                await updateTimeToServer(true);
+            }
+            try {
+                const response = await fetch('/api/auth/logout', { method: 'POST' });
+                if (response.ok) window.location.href = '/login';
+                else alert('Logout failed.');
+            } catch (error) { console.error('Logout error:', error); alert('An error occurred during logout.'); }
+        });
+
+        // --- Time Tracking Functions ---
+        function startTracking() {
+            if (isTracking) {
+                return;
+            }
+
+            fetch('/api/tracking/start', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ file_id: {{ file.id }} })
+            })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.log_id) {
+                    currentLogId = data.log_id;
+                    isTracking = true;
+                    sessionDurationSeconds = 0;
+                    lastUpdateTime = Date.now();
+
+                    // Initialize session time display
+                    sessionTimeDiv.textContent = formatDuration(0); 
+                    // Initialize total time display based on potentially updated total from server
+                    totalTimeDiv.textContent = formatDuration(totalDurationSeconds); 
+                    totalTimeAllDiv.textContent = formatDuration(totalDurationSeconds);
+
+                    // Clear any existing interval
+                    if (timerInterval) {
+                        clearInterval(timerInterval);
+                    }
+
+                    // Start a new timer that updates every second
+                    timerInterval = setInterval(() => {
+                        // Increment session time
+                        sessionDurationSeconds += 1;
+                        
+                        // Update session time display
+                        sessionTimeDiv.textContent = formatDuration(sessionDurationSeconds);
+                        
+                        // Last time spent shows only DB total (previous sessions)
+                        totalTimeDiv.textContent = formatDuration(totalDurationSeconds);
+                        
+                        // Total time spent shows DB total + current session
+                        const totalTime = totalDurationSeconds + sessionDurationSeconds;
+                        console.log('Time Calculation:', {
+                            lastTimeSpent: totalDurationSeconds,
+                            currentSession: sessionDurationSeconds,
+                            totalTimeSpent: totalTime
+                        });
+                        totalTimeAllDiv.textContent = formatDuration(totalTime);
+                        
+                        // Update progress bar based on total time
+                        updateProgress(totalTime);
+
+                        // === STOP TIMER IF PROGRESS IS 100% ===
+                        const estimatedDuration = {{ file.estimated_duration|default(3600) }};
+                        if (totalTime >= estimatedDuration) {
+                            clearInterval(timerInterval);
+                            timerInterval = null;
+                            // Set the last time spent to the completion value
+                            totalTimeDiv.textContent = formatDuration(estimatedDuration);
+                            totalTimeAllDiv.textContent = formatDuration(estimatedDuration);
+                            sessionTimeDiv.textContent = formatDuration(0);
+                            // Optionally disable pause/resume
+                            document.getElementById('pauseResumeButton').disabled = true;
+                            showTrackingMessage('You have completed the estimated reading time!', 'success');
+                        }
+                    }, 1000);
+
+                    showTrackingMessage('Tracking started', 'success');
+                }
+            })
+            .catch(error => {
+                showTrackingMessage('Failed to start tracking', 'danger');
+            });
+        }
+
+        function stopTracking() {
+            if (!isTracking) {
+                return;
+            }
+
+            // Clear the timer
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+
+            // Send final update to server
+            if (currentLogId && sessionDurationSeconds > 0) {
+                updateTimeToServer(true);
+            }
+
+            isTracking = false;
+            currentLogId = null;
+            sessionDurationSeconds = 0;
+            sessionTimeDiv.textContent = formatDuration(0);
+            isPaused = false;
+            document.getElementById('pauseResumeButton').textContent = 'Pause';
+        }
+
+        function updateTimeToServer(isFinal = false) {
+            if (!currentLogId) {
+                return;
+            }
+
+            fetch('/api/tracking/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    log_id: currentLogId,
+                    session_duration: sessionDurationSeconds
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.total_file_duration !== undefined) {
+                    console.log('Server response:', {
+                        oldTotal: totalDurationSeconds,
+                        newTotal: data.total_file_duration,
+                        currentSession: sessionDurationSeconds
+                    });
+                    
+                    // Update the base total duration from DB
+                    totalDurationSeconds = data.total_file_duration;
+                    
+                    // Update Last time spent when the session ends
+                    if (isFinal) {
+                        totalTimeDiv.textContent = formatDuration(totalDurationSeconds);
+                        totalTimeAllDiv.textContent = formatDuration(totalDurationSeconds);
+                    } else {
+                        // During active session, show current total (DB total + current session)
+                        const totalTime = totalDurationSeconds + sessionDurationSeconds;
+                        totalTimeDiv.textContent = formatDuration(totalDurationSeconds);
+                        totalTimeAllDiv.textContent = formatDuration(totalTime);
+                    }
+
+                    if (!isFinal) {
+                        lastUpdateTime = Date.now();
+                    }
+                    updateProgress(isFinal ? totalDurationSeconds : totalDurationSeconds + sessionDurationSeconds);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating time:', error);
+            });
+        }
+
+        // Helper function to format seconds into H:M:S or M:S
+        function formatDuration(totalSeconds) {
+            if (totalSeconds == null || totalSeconds < 0) return '0s'; // Ensure null/negative returns 0s
+            totalSeconds = Math.floor(totalSeconds); // Ensure integer seconds
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60; // Remainder is seconds
+            
+            let result = '';
+            if (hours > 0) {
+                 result += `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            } else if (minutes > 0) {
+                 result += `${minutes}:${String(seconds).padStart(2, '0')}`;
+            } else {
+                 result += `${seconds}s`; // Only show seconds if less than a minute
+            }
+            return result;
+        }
+
+        // Start tracking when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, page ready');
+            console.log('Initial values:', {
+                fileId: fileId,
+                totalDuration: totalDurationSeconds,
+                estimatedDuration: {{ file.estimated_duration|default(3600) }}
+            });
+
+            // Initialize display on load
+            totalTimeDiv.textContent = formatDuration(totalDurationSeconds);
+            totalTimeAllDiv.textContent = formatDuration(totalDurationSeconds);
+            sessionTimeDiv.textContent = formatDuration(0); // Start session display at 0s
+            updateProgress(totalDurationSeconds); // Initial progress based on total only
+
+            // --- Setup Debug Tools (Optional) ---
+            try { // Wrap debug setup in try/catch to be safe
+                const debugDiv = document.createElement('div');
+                debugDiv.innerHTML = `
+                    <div class="card mt-4 bg-light">
+                        <div class="card-header bg-warning text-dark">Debug Tools</div>
+                        <div class="card-body">
+                            <div class="mb-2">
+                                <span class="badge bg-info">File ID: ${fileId}</span>
+                                <span class="badge bg-secondary">Initial Duration: ${totalDurationSeconds}s</span>
+                                <span class="badge bg-secondary">Estimated Duration: ${formatDuration({{ file.estimated_duration|default(3600) }})}</span>
+                            </div>
+                            <div class="btn-group">
+                                <button id="debugStartTracking" class="btn btn-sm btn-primary">Test Start</button>
+                                <button id="debugUpdateTracking" class="btn btn-sm btn-success">Update (10s)</button>
+                                <button id="debugForceReload" class="btn btn-sm btn-danger">Force Reload</button>
+                                <button id="debugShowVars" class="btn btn-sm btn-info">Show Variables</button>
+                                <button id="debugClearTimer" class="btn btn-sm btn-warning">Reset Timer</button>
+                            </div>
+                            <div id="debugOutput" class="mt-2 small" style="max-height: 200px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 5px;"></div>
+                        </div>
+                    </div>
+                `;
+                
+                // Find the container and append debug tools only if found
+                const mainContainer = document.querySelector('main .container'); 
+                if (mainContainer) {
+                    mainContainer.appendChild(debugDiv);
+                    
+                    // --- Add Debug Event Listeners ONLY if debugDiv was added ---
+                    document.getElementById('debugStartTracking').addEventListener('click', async () => {
+                        // debugLog('Testing start tracking API call directly...');
+                        try {
+                            // First stop any existing tracking
+                            if (isTracking) {
+                                clearInterval(timerInterval);
+                                isTracking = false;
+                            }
+                            
+                            const response = await fetch('/api/tracking/start', {
+                                method: 'POST',
+                                headers: { 
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify({ file_id: fileId })
+                            });
+                            
+                            const contentType = response.headers.get('content-type');
+                            if (contentType && contentType.indexOf('application/json') !== -1) {
+                                const data = await response.json();
+                                
+                                if (response.ok && data.log_id) {
+                                    // Store for update test
+                                    window.testLogId = data.log_id;
+                                    
+                                    // Update UI
+                                    totalTimeDiv.textContent = formatDuration(data.total_duration || 0);
+                                    
+                                    // Restart tracking
+                                    startTracking();
+                                }
+                            } else {
+                                const text = await response.text();
+                            }
+                        } catch (error) {
+                            // debugLog(`Error: ${error.message}`);
+                        }
+                    });
+                    
+                    document.getElementById('debugUpdateTracking').addEventListener('click', async () => {
+                       const logId = window.testLogId || currentLogId;
+                       if (!logId) { return; }
+                        // debugLog(`Testing update tracking...`);
+                       try {
+                            const response = await fetch('/api/tracking/update', {
+                                method: 'POST',
+                                headers: { 
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify({ 
+                                    log_id: logId,
+                                    session_duration: 10 // Test with 10 seconds
+                                })
+                            });
+                            
+                            const contentType = response.headers.get('content-type');
+                            if (contentType && contentType.indexOf('application/json') !== -1) {
+                                const data = await response.json();
+                                
+                                if (response.ok && data.total_file_duration !== undefined) {
+                                    // Update UI with new total
+                                    totalDurationSeconds = data.total_file_duration;
+                                    totalTimeDiv.textContent = formatDuration(totalDurationSeconds);
+                                    totalTimeAllDiv.textContent = formatDuration(totalDurationSeconds);
+                                    updateProgress(totalDurationSeconds);
+                                }
+                            } else {
+                                const text = await response.text();
+                            }
+                       } catch (error) {
+                            // debugLog(`Error: ${error.message}`);
+                       }
+                    });
+                    
+                    document.getElementById('debugShowVars').addEventListener('click', () => {
+                        // debugLog(`Current Variables:...`);
+                    });
+                    
+                    document.getElementById('debugClearTimer').addEventListener('click', () => {
+                        if (timerInterval) {
+                           // ... (rest of debugClearTimer listener)
+                        } else {
+                            // debugLog('No active timer to clear.');
+                        }
+                    });
+                    
+                    document.getElementById('debugForceReload').addEventListener('click', () => {
+                        // debugLog('Forcing page reload...');
+                        window.location.reload();
+                    });
+                    // --- End Debug Event Listeners ---
+
+                } else {
+                    console.error("Could not find 'main .container' to append debug tools.");
+                }
+            } catch (debugError) {
+                console.error("Error setting up debug tools:", debugError);
+            }
+            // --- End Debug Tools Setup ---
+            
+            // --- Debug log function (ensure it exists even if tools aren't added) ---
+            // Simplified debugLog that only logs to console
+            function debugLog(message) {
+                console.log(`[DEBUG] ${message}`); // Always log to console
+            }
+            // --- End Debug log function ---
+
+            // Start tracking with a slight delay (ensure this runs regardless of debug tools)
+            setTimeout(() => {
+                debugLog('Starting automatic tracking...');
+                startTracking();
+            }, 500); 
+
+            // --- Bookmark Functionality ---
+            const bookmarkKey = `bookmark_file_${fileId}`;
+            document.getElementById('bookmarkButton').addEventListener('click', function() {
+                const scrollY = window.scrollY;
+                localStorage.setItem(bookmarkKey, scrollY);
+                showTrackingMessage('Bookmark set! You can return to this spot later.', 'info');
+            });
+
+            // On page load, check for bookmark and scroll
+            const savedScroll = localStorage.getItem(bookmarkKey);
+            if (savedScroll !== null) {
+                setTimeout(() => {
+                    window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'smooth' });
+                    showTrackingMessage('Restored to your last bookmark.', 'success');
+                }, 700);
+            }
+
+            // --- Line Bookmark Functionality ---
+            const lineBookmarkKey = `bookmark_line_file_${fileId}`;
+            document.querySelectorAll('.bookmark-line-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    const lineNum = this.getAttribute('data-line');
+                    localStorage.setItem(lineBookmarkKey, lineNum);
+                    showTrackingMessage('Line bookmarked! You can return to this line later.', 'info');
+                });
+            });
+            // On page load, check for line bookmark and scroll/highlight
+            const savedLine = localStorage.getItem(lineBookmarkKey);
+            if (savedLine !== null) {
+                const lineElem = document.getElementById('line-' + savedLine);
+                const container = document.getElementById('extractedTextContainer');
+                if (lineElem && container) {
+                    setTimeout(() => {
+                        // Scroll the line into view within the container
+                        lineElem.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+                        // Also ensure the container is focused for accessibility
+                        container.focus && container.focus();
+                        // Always highlight the line
+                        lineElem.style.background = '#ffe066';
+                        showTrackingMessage('Restored to your bookmarked line.', 'success');
+                        setTimeout(() => { lineElem.style.background = ''; }, 4000);
+                    }, 700);
+                }
+            }
+        });
+
+        // --- Helper Functions ---
+        function showTrackingMessage(msg, type) {
+            console.log(`Showing message: ${msg} (${type})`);
+            trackingMessageDiv.textContent = msg;
+            trackingMessageDiv.className = `alert alert-${type}`;
+            trackingMessageDiv.classList.remove('d-none');
+            
+            // Auto-hide the message after 5 seconds
+            setTimeout(() => {
+                trackingMessageDiv.classList.add('d-none');
+            }, 5000);
+        }
+
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                if (isTracking) {
+                    stopTracking();
+                }
+            } else if (document.visibilityState === 'visible') {
+                // When coming back to the page, start fresh
+                totalDurationSeconds = {{ total_duration_seconds|default(0) }};
+                sessionDurationSeconds = 0;
+                startTracking();
+            }
+        });
+
+        // Handle page unload
+        window.addEventListener('beforeunload', () => {
+            if (isTracking && currentLogId) {
+                // Use sendBeacon for more reliable delivery during page unload
+                const data = JSON.stringify({ 
+                    log_id: currentLogId,
+                    session_duration: sessionDurationSeconds,
+                    is_final: true
+                });
+                navigator.sendBeacon('/api/tracking/update', data);
+            }
+        });
+
+        // Add reset functionality
+        document.getElementById('resetTimeButton').addEventListener('click', async () => {
+            if (confirm('Are you sure you want to reset all reading time for this file? This cannot be undone.')) {
+                try {
+                    // Stop current tracking if active
+                    if (isTracking) {
+                        stopTracking();
+                    }
+
+                    // Call server to reset time
+                    const response = await fetch('/api/tracking/reset', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ file_id: {{ file.id }} })
+                    });
+
+                    if (response.ok) {
+                        // Reset all time variables
+                        totalDurationSeconds = 0;
+                        sessionDurationSeconds = 0;
+                        
+                        // Update displays
+                        totalTimeDiv.textContent = formatDuration(0);
+                        totalTimeAllDiv.textContent = formatDuration(0);
+                        sessionTimeDiv.textContent = formatDuration(0);
+                        
+                        // Reset progress bar
+                        updateProgress(0);
+                        
+                        // Start fresh tracking
+                        startTracking();
+                        
+                        // Re-enable pause/resume button
+                        document.getElementById('pauseResumeButton').disabled = false;
+                        showTrackingMessage('Reading time has been reset', 'success');
+                    } else {
+                        showTrackingMessage('Failed to reset reading time', 'danger');
+                    }
+                } catch (error) {
+                    console.error('Error resetting time:', error);
+                    showTrackingMessage('Failed to reset reading time', 'danger');
+                }
+            }
+        });
+
+        // --- Pause/Resume Functionality ---
+        document.getElementById('pauseResumeButton').addEventListener('click', function() {
+            if (!isPaused) {
+                // Pause the timer
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                isPaused = true;
+                this.textContent = 'Resume';
+                showTrackingMessage('Tracking paused', 'warning');
+            } else {
+                // Resume the timer
+                isPaused = false;
+                this.textContent = 'Pause';
+                // Restart the timer
+                timerInterval = setInterval(() => {
+                    sessionDurationSeconds += 1;
+                    sessionTimeDiv.textContent = formatDuration(sessionDurationSeconds);
+                    totalTimeDiv.textContent = formatDuration(totalDurationSeconds);
+                    const totalTime = totalDurationSeconds + sessionDurationSeconds;
+                    totalTimeAllDiv.textContent = formatDuration(totalTime);
+                    updateProgress(totalTime);
+                }, 1000);
+                showTrackingMessage('Tracking resumed', 'info');
+            }
+        });
+    </script>
+</body>
+</html> 

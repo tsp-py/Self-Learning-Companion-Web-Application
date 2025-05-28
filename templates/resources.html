@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educational Resources - SkillSync AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        body { 
+            padding-top: 5rem; 
+            font-family: Arial, sans-serif;
+        }
+        .header-row {
+            background-color: #0d6efd;
+            color: white;
+            padding: 15px 0;
+        }
+        .search-box {
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            padding: 8px 15px;
+            width: 100%;
+        }
+        .search-button {
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 15px;
+        }
+        .filter-card {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .resource-icon {
+            font-size: 72px;
+            color: #6c757d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/dashboard">SoloLearn</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/files">Files</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/resources">Resources</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/courses">Courses</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/practice">Practice</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/external-content">External Content</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/reading-list">Reading List</a>
+                    </li>
+                </ul>
+                <form class="d-flex">
+                    <button id="logoutButton" class="btn btn-outline-danger" type="button">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="my-4">
+            <h1 class="display-5 mb-4">Educational Resources</h1>
+            
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search for resources...">
+                        <button class="btn btn-primary" type="button" id="searchButton">
+                            <i class="bi bi-search me-1"></i> Search
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex justify-content-md-end mt-3 mt-md-0">
+                        <div class="me-2">
+                            <label for="resourceType" class="form-label">Resource Type</label>
+                            <select class="form-select" id="resourceType">
+                                <option value="all" selected>All Types</option>
+                                <option value="pdf">PDF Documents</option>
+                                <option value="video">Video Tutorials</option>
+                                <option value="code">Code Samples</option>
+                                <option value="presentation">Presentations</option>
+                                <option value="ebook">E-Books</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="applyFilters" class="form-label">&nbsp;</label>
+                            <button class="btn btn-primary d-block" id="applyFilters">Apply Filters</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="searchResults" class="my-5">
+                <div class="empty-state">
+                    <div class="resource-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h3>Search for Educational Resources</h3>
+                    <p class="text-muted">Enter keywords above to find documents, presentations, e-books and more</p>
+                </div>
+                
+                <!-- Resource results will be populated here by JavaScript -->
+                <div id="resourcesList" class="row g-4" style="display: none;">
+                    <!-- Example resource card (will be generated dynamically) -->
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Introduction to Machine Learning</h5>
+                                <p class="card-text">A comprehensive guide to understanding ML fundamentals.</p>
+                                <span class="badge bg-primary">PDF</span>
+                                <span class="badge bg-secondary">Machine Learning</span>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Added: Jan 15, 2023</small>
+                                <a href="#" class="btn btn-sm btn-outline-primary">View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Search functionality
+        document.getElementById('searchButton').addEventListener('click', searchResources);
+        document.getElementById('searchInput').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                searchResources();
+            }
+        });
+        
+        document.getElementById('applyFilters').addEventListener('click', searchResources);
+        
+        function searchResources() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            const resourceType = document.getElementById('resourceType').value;
+            
+            // Show loading state
+            const resultsContainer = document.getElementById('searchResults');
+            resultsContainer.innerHTML = '<div class="text-center my-5"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+            
+            // Make API call to search resources
+            fetch(`/api/resources/search?q=${encodeURIComponent(searchTerm)}&type=${resourceType}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayResults(data);
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    resultsContainer.innerHTML = '<div class="alert alert-danger">Error searching resources. Please try again.</div>';
+                });
+        }
+        
+        function displayResults(resources) {
+            const resultsContainer = document.getElementById('searchResults');
+            const resourcesList = document.getElementById('resourcesList');
+            
+            if (resources.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="resource-icon">
+                            <i class="bi bi-emoji-frown"></i>
+                        </div>
+                        <h3>No resources found</h3>
+                        <p class="text-muted">Try different search terms or filters</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Clear previous results
+            resourcesList.innerHTML = '';
+            
+            // Display each resource as a card
+            resources.forEach(resource => {
+                const card = document.createElement('div');
+                card.className = 'col-md-4';
+                card.innerHTML = `
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">${resource.title}</h5>
+                            <p class="card-text">${resource.description}</p>
+                            <span class="badge bg-primary">${resource.type}</span>
+                            ${resource.tags.map(tag => `<span class="badge bg-secondary">${tag}</span>`).join(' ')}
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <small class="text-muted">Added: ${new Date(resource.upload_date).toLocaleDateString()}</small>
+                            <a href="/resources/view/${resource.id}" class="btn btn-sm btn-outline-primary">View</a>
+                        </div>
+                    </div>
+                `;
+                resourcesList.appendChild(card);
+            });
+            
+            // Show results
+            resultsContainer.innerHTML = '';
+            resultsContainer.appendChild(resourcesList);
+            resourcesList.style.display = 'flex';
+        }
+        
+        // Logout functionality
+        document.getElementById('logoutButton').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/auth/logout', { method: 'POST' });
+                if (response.ok) {
+                    window.location.href = '/login';
+                } else {
+                    alert('Logout failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('An error occurred during logout.');
+            }
+        });
+    </script>
+</body>
+</html> 
