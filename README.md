@@ -2,6 +2,11 @@
 
 A single-user learning management system to upload files, track study time, and visualize learning progress with real-time analytics.
 
+## 📚 Documentation
+
+- [Project Report](docs/Self-Learning-Companion-Web-Application-Report.pdf)
+- [Research Paper](docs/Research-Paper.pdf)
+
 ---
 
 ## Features
