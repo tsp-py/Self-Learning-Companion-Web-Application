@@ -69,3 +69,5 @@ git clone https://github.com/tsp-py/self-learning-companion-Web-Application.git
 cd self-learning-companion-Web-Applicationb
 pip install -r requirements.txt
 python app.py
+
+http://localhost:5000
